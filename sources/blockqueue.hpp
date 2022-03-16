@@ -24,14 +24,14 @@ namespace utils
 
         void push(const T& x)
         {
-            std::unique_lock lock(m_mtx);
-            m_queue.push(x);
-            m_mtx.notify();
+			std::lock_guard<std::mutex> lock(m_mtx);
+			m_queue.push(x);
+			m_Condit.notify_one();
         }
 
         void push(T&& x)
         {
-            std::unique_lock<std::mutex> lock(m_mtx);
+            std::lock_guard<std::mutex> lock(m_mtx);
             m_queue.push(std::move(x));
             m_Condit.notify_one();
         }
@@ -52,7 +52,8 @@ namespace utils
             （2）如果表达式为true，那么wait返回，流程走下来（此时互斥量锁还是锁着的），流程只要能走到这里来，这个互斥量锁一定是锁着的。
             （3）如果没有第二个参数，wait就返回，流程走下来
             */
-            m_Condit.wait(lock);
+            while(m_queue.empty())
+                m_Condit.wait(lock);
             assert(!m_queue.empty());
             T front(std::move(m_queue.front()));
             m_queue.pop();
@@ -63,7 +64,7 @@ namespace utils
         {
             queue_type queue;
             {
-                std::unique_lock<std::mutex> lock(m_mtx);
+                std::lock_guard<std::mutex> lock(m_mtx);
                 queue = std::move(m_queue);
                 assert(m_queue.empty());
             }
@@ -72,7 +73,7 @@ namespace utils
 
         size_t size() const
         {
-            std::unique_lock lock(m_mtx);
+            std::lock_guard lock(m_mtx);
             return m_queue.size();
         }
 
