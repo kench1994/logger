@@ -12,14 +12,14 @@ if is_os("windows") then
 else
     add_cxflags("-MD", {force = true})
 end
-
+add_requires("vcpkg::boost-system", "vcpkg::boost-filesystem", {configs={runtime_link="shared", shared=true, debug=true}})
 target("blockqueue")
     set_kind("binary")
     set_symbols("debug")
     
     add_includedirs("sources")
     add_files("sources/*.cpp")
-    add_packages("vcpkg::boost-any")
+    add_packages("vcpkg::boost-any", "vcpkg::boost-system", "vcpkg::boost-filesystem")
     after_build(function(target)
         import("target.action.install")(target)
     end)

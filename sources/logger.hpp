@@ -2,6 +2,8 @@
 #include "ParamPacker.hpp"
 #include "BlockQueue.hpp"
 #include <string>
+#include <iostream>
+#include <boost/format.hpp>
 
 /* Returns microseconds since epoch */
 inline uint64_t timestamp_now()
@@ -33,7 +35,7 @@ inline uint64_t timestamp_now()
 //     }
 // }
 //我认为log level应该是每个printer单独设置?
-namespace log
+namespace log_helper
 {
     typedef struct tagLogLine {
         tagLogLine() = delete;
@@ -44,8 +46,39 @@ namespace log
             const char* pszFmt,\
             utils::ParamPacker&& params)
             : uLevel(level), strFile(pszFile), uLine(line), strFunction(pszFunction),\
-            strLogFmt(pszFmt ? pszFmt : ""), stParams(params), ullTimeStamp(std::move(timestamp_now))
+            strLogFmt(pszFmt ? pszFmt : ""), stParams(params), ullTimeStamp(std::move(timestamp_now()))
         {}
+
+        void test_print()
+        {
+            std::cout << strFile << std::endl;
+            std::cout << uLine << std::endl;
+            std::cout << strFunction << std::endl;
+            boost::format fmt(strLogFmt);
+            for (auto&& it : stParams.vParams)
+            {
+                std::cout << it.type().name() << std::endl;
+                if (it.type() == typeid(int)) {
+                    fmt % boost::any_cast<int>(it);
+                }
+                else if (it.type() == typeid(unsigned int)) {
+                    fmt % boost::any_cast<unsigned int>(it);
+                }
+                else if (it.type() == typeid(unsigned long long)) {
+                    fmt % boost::any_cast<unsigned long long>(it);
+                }
+                else if (it.type() == typeid(const char*)) {
+                    fmt % boost::any_cast<const char*>(it);
+                }
+                else if (it.type() == typeid(std::string)) {
+                    fmt % boost::any_cast<std::string>(it).c_str();
+                }
+                else if (it.type() == typeid(char)) {
+                    fmt % boost::any_cast<char>(it);
+                }
+            }
+            std::cout << fmt.str() << std::endl;
+        }
         uint64_t ullTimeStamp;
         unsigned int uLevel;
         std::string strFile;
@@ -61,7 +94,7 @@ namespace log
             utils::BlockingQueue<std::unique_ptr<LogLine>> m_Logqueue;
 
         protected:
-            static logger& logger::instance()
+            static logger& GetInstance()
             {
                 static logger s_logger;
                 return s_logger;
@@ -71,9 +104,9 @@ namespace log
             logger() {}
             ~logger() {}
 
-            utils::BlockingQueue<std::unique_ptr<LogLine>>& logger_cache()
+            static utils::BlockingQueue<std::unique_ptr<LogLine>>& logger_cache()
             {
-                return instance().m_Logqueue;
+                return GetInstance().m_Logqueue;
             }
     };
 }
@@ -82,7 +115,7 @@ namespace log
 { \
 utils::ParamPacker packer; \
 packer.pack(##__VA_ARGS__); \
-auto spLogLine = std::make_unique<log::LogLine>(level, \
+auto spLogLine = std::make_unique<log_helper::LogLine>(level, \
 __FILE__, static_cast<unsigned int>(__LINE__), __FUNCTION__, fmt, std::move(packer)); \
-log::logger::instance().loger_cache().emplace_back(std::move(spLogLine)); \
+log_helper::logger::logger_cache().push(std::move(spLogLine)); \
 }
