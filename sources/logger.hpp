@@ -1,15 +1,10 @@
-#include <list>
-#include <string>
-#include <memory>
-#include <chrono>
+#include "blockqueue.hpp"
 #define __LOG(loger, level, fmt, ...)\
 {\
 }
 /* Returns microseconds since epoch */
 static uint64_t timestamp_now()
 {
-    //TODO:what's difference?
-//	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
     return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 //todo time-format 学习下boost time
@@ -45,8 +40,8 @@ namespace utils
             logger() {}
             ~logger() {}
         protected:
-
+            
         private:
-            std::list<std::shared_ptr<std::string>> m_vLogInfos;
+            BlockingQueue<std::string> m_Logqueue;
     };
 }
