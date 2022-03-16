@@ -1,1 +1,2 @@
-public void println(int logLevel, String tag, String msg) {
+#pragma once
+//public void println(int logLevel, String tag, String msg) {

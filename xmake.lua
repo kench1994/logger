@@ -13,12 +13,13 @@ else
     add_cxflags("-MD", {force = true})
 end
 
-target("block_queue")
+target("blockqueue")
     set_kind("binary")
     set_symbols("debug")
     
     add_includedirs("sources")
     add_files("sources/*.cpp")
+    add_packages("vcpkg::boost-any")
     after_build(function(target)
         import("target.action.install")(target)
     end)
