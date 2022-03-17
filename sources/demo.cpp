@@ -1,18 +1,31 @@
 #include "Logger.hpp"
+#include "FilePrinter.hpp"
+#include "ConsolePrinter.hpp"
+#include <iostream>
 int main()
 {
+	
+	//std::cout << utils::time_helper::Stamp2TimeString(utils::time_helper::timestamp_now()) << std::endl;
+	{
+		std::string strErrInfo;
+		auto spConsolePrinter = std::make_shared<log_helper::ConsolePrinter>();
+		log_helper::Logger::GetInstance().AppendPrinter(spConsolePrinter);
+		auto spFilePrinter = std::make_shared<log_helper::FilePrinter>();
+		if (0 == spFilePrinter->Init(strErrInfo))
+			log_helper::Logger::GetInstance().AppendPrinter(spFilePrinter);
+
+	}
     std::thread t([](){
         for (;;)
         {
-            auto spLogLine = std::move(log_helper::logger::logger_cache().wait_and_pop());
-            spLogLine->test_print();
+
+			log_helper::Logger::GetInstance().Consume();
+
+            
         }
     });
-    t.detach();
-	LOG(0, "%s + %s = %c", "1", "2", '3');
-	LOG(0, "%s + %s = %c", "2", "2", '3');
-	LOG(0, "%s + %s = %c", "3", "2", '3');
-	LOG(0, "%s + %s = %c", "4", "2", '3');
-    getchar();
+	LOG(XLOG_WARN, "%s + %s = %c", "3", "2", '3');
+	LOG(XLOG_ERROR, "%s + %s = %c", "4", "2", '3');
+	t.join();
     return 0;
 }

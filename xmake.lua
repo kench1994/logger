@@ -18,6 +18,7 @@ target("blockqueue")
     set_symbols("debug")
     
     add_includedirs("sources")
+    add_headerfiles("sources/*.hpp")
     add_files("sources/*.cpp")
     add_packages("vcpkg::boost-system")
     after_build(function(target)
