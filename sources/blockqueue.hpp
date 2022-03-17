@@ -52,8 +52,12 @@ namespace utils
             （2）如果表达式为true，那么wait返回，流程走下来（此时互斥量锁还是锁着的），流程只要能走到这里来，这个互斥量锁一定是锁着的。
             （3）如果没有第二个参数，wait就返回，流程走下来
             */
+
             while(m_queue.empty())
                 m_Condit.wait(lock);
+            /*
+            For performance reasons, the POSIX API allows the OS to wake up your thread even if the condition has not been fulfilled (that's called a spurious wakeup).
+            */
             assert(!m_queue.empty());
             T front(std::move(m_queue.front()));
             m_queue.pop();

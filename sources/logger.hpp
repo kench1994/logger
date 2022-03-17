@@ -1,15 +1,12 @@
 #pragma once
 #include "ParamPacker.hpp"
 #include "BlockQueue.hpp"
+#include "time_helper.hpp"
 #include <string>
 #include <iostream>
 #include <boost/format.hpp>
 
-/* Returns microseconds since epoch */
-inline uint64_t timestamp_now()
-{
-    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-}
+
 // //todo time-format 学习下boost time
 // static void format_timestamp(std::ostream & os, uint64_t timestamp)
 // {
@@ -46,7 +43,7 @@ namespace log_helper
             const char* pszFmt,\
             utils::ParamPacker&& params)
             : uLevel(level), strFile(pszFile), uLine(line), strFunction(pszFunction),\
-            strLogFmt(pszFmt ? pszFmt : ""), stParams(params), ullTimeStamp(std::move(timestamp_now()))
+            strLogFmt(pszFmt ? pszFmt : ""), stParams(params), ullTimeStamp(std::move(utils::time_helper::timestamp_now()))
         {}
 
         void test_print()
@@ -100,10 +97,11 @@ namespace log_helper
                 return s_logger;
             }
 
+
         public:
             logger() {}
             ~logger() {}
-
+            
             static utils::BlockingQueue<std::unique_ptr<LogLine>>& logger_cache()
             {
                 return GetInstance().m_Logqueue;
