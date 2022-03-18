@@ -12,15 +12,15 @@ if is_os("windows") then
 else
     add_cxflags("-MD", {force = true})
 end
-add_requires("vcpkg::boost-system", {configs={runtime_link="shared", shared=true, debug=true}})
+add_requires("vcpkg::boost-system", "vcpkg::boost-timer", {configs={runtime_link="shared", shared=true, debug=true}})
 target("blockqueue")
     set_kind("binary")
     set_symbols("debug")
     
     add_includedirs("sources", "Utils")
-    add_headerfiles("sources/*.hpp", "../")
+    add_headerfiles("sources/*.hpp")
     add_files("sources/*.cpp")
-    add_packages("vcpkg::boost-system")
+    add_packages("vcpkg::boost-system", "vcpkg::boost-timer")
     after_build(function(target)
         import("target.action.install")(target)
         print("echo" .. "$(buildir)/$(plat)/$(arch)/$(mode)")
