@@ -2,6 +2,9 @@
 #include "IFormater.hpp"
 #include <boost/format.hpp>
 #include <utils/unique_array.hpp>
+#ifdef _DEBUG
+#include <iostream>
+#endif
 
 namespace log_helper
 {
@@ -14,7 +17,7 @@ namespace log_helper
 
             std::string flat(std::shared_ptr<LogLine>spLogLine) override
             {
-				boost::format fmt(spLogLine->strLogFmt);
+				boost::format fmt(spLogLine->strLogFmt.c_str());
 				for (auto&& it : spLogLine->stParams.vParams)
 				{
 					if (it.type() == typeid(int)) {
@@ -35,6 +38,12 @@ namespace log_helper
 					else if (it.type() == typeid(char)) {
 						fmt % boost::any_cast<char>(it);
 					}
+					else if(it.type() == typeid(float)){
+						fmt % boost::any_cast<float>(it);
+					}
+					else if(it.type() == typeid(double)){
+						fmt % boost::any_cast<double>(it);
+					}
 				}
 				size_t nPos = 0;
 				//TODO:string_view
@@ -51,7 +60,8 @@ namespace log_helper
 					spLogLine->uLine
 				);
 				//TODO:how can i avoid string construct copy
-				return std::string(auto_buffer.get());
+				std::string ss(auto_buffer.get());
+				return ss;
             }
     };
 } // namespace log_helper
