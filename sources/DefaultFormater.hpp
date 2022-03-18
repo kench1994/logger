@@ -1,6 +1,8 @@
 #pragma once
 #include "IFormater.hpp"
 #include <boost/format.hpp>
+#include <utils/unique_array.hpp>
+
 namespace log_helper
 {
     class DefaultFormater 
@@ -35,15 +37,21 @@ namespace log_helper
 					}
 				}
 				size_t nPos = 0;
-                boost::format fmtFlattenData("%s [%s] %s {%s:%d}\n");
-                fmtFlattenData % utils::time_helper::Stamp2TimeString(spLogLine->ullTimeStamp).c_str()
-                               % log_helper::getLevelName(spLogLine->enLevel).c_str()
-                               % fmt.str().c_str()
-                               % (std::string::npos == (nPos = spLogLine->strFile.find_last_of("\\")) ?\
-                                 spLogLine->strFile.c_str() : spLogLine->strFile.substr(nPos + 1).c_str()) \
-                               % spLogLine->uLine;
-                return fmtFlattenData.str();
-				return "";
+				//TODO:string_view
+				std::string strFileName = (std::string::npos == (nPos = spLogLine->strFile.find_last_of("\\")) ? spLogLine->strFile : spLogLine->strFile.substr(nPos + 1));
+				//预估需要的空间
+				size_t nReserveSize = fmt.str().length() + strFileName.length() + 42;
+				utils::unique_array<char> auto_buffer(new char[nReserveSize]);
+				memset(auto_buffer.get(), '\0', nReserveSize);
+				sprintf_s(auto_buffer.get(), nReserveSize - 1, "%s [%s] %s {%s:%d}\n",\
+					utils::time_helper::Stamp2TimeString(spLogLine->ullTimeStamp).c_str(), \
+					log_helper::getLevelName(spLogLine->enLevel).c_str(), \
+					fmt.str().c_str(), \
+					strFileName.c_str(), \
+					spLogLine->uLine
+				);
+				//TODO:how can i avoid string construct copy
+				return std::string(auto_buffer.get());
             }
     };
 } // namespace log_helper

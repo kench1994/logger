@@ -1,7 +1,7 @@
 #pragma once
 #include "LogLevel.hpp"
-#include "TimeHelper.hpp"
 #include "ParamPacker.hpp"
+#include <utils/time_helper.hpp>
 
 namespace log_helper
 {

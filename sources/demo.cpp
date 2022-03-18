@@ -24,8 +24,8 @@ int main()
             
         }
     });
-	LOG(XLOG_WARN, "%s + %s = %c", "3", "2", '3');
-	LOG(XLOG_ERROR, "%s + %s = %c", "4", "2", '3');
+	LOG(XLOG_WARN, "%s + %s = %c", "1", "2", '3');
+	LOG(XLOG_ERROR, "%s + %s = %c", "2", "2", '4');
 	t.join();
     return 0;
 }

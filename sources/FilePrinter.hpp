@@ -1,6 +1,6 @@
 #pragma once
 #include "IPrinter.hpp"
-#include "TimeHelper.hpp"
+#include <utils/time_helper.hpp>
 #include <fstream>
 #include <sstream>
 namespace log_helper
@@ -64,11 +64,14 @@ namespace log_helper
 			//获取下一天时间撮用于跨日判断
 			m_ullNextRollTimeStamp = utils::time_helper::timestamp_today() + utils::time_helper::DayMillseconds;
 			//TODO: 日志文件模式
-			boost::format fmtLogFile("%s_%s.%s");
-			fmtLogFile % m_Configure.strLogFilePosfix.c_str() % utils::time_helper::GetDateTime() % m_Configure.strLogFileType.c_str();
-			std::string strLogFilePath;
-			strLogFilePath.append(m_Configure.strLogFilePath).append("\\").append(std::move(fmtLogFile.str()));
-			m_ofStream.open(strLogFilePath.c_str(), std::ios::app);
+			char szFileName[64]{'\0'};
+			sprintf_s(szFileName, sizeof(szFileName) - 1, "%s\\%s_%s.%s",\
+				m_Configure.strLogFilePath.c_str(),\
+				m_Configure.strLogFilePosfix.c_str(),\
+				utils::time_helper::GetDateTime().c_str(),
+				m_Configure.strLogFileType.c_str()
+			);
+			m_ofStream.open(szFileName, std::ios::app);
 		}
 	private:
 		uint64_t m_ullNextRollTimeStamp;
