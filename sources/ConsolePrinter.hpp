@@ -43,39 +43,7 @@ namespace log_helper
 					break;
 				}
 
-				boost::format fmt(spLogLine->strLogFmt);
-				for (auto&& it : spLogLine->stParams.vParams)
-				{
-					if (it.type() == typeid(int)) {
-						fmt % boost::any_cast<int>(it);
-					}
-					else if (it.type() == typeid(unsigned int)) {
-						fmt % boost::any_cast<unsigned int>(it);
-					}
-					else if (it.type() == typeid(unsigned long long)) {
-						fmt % boost::any_cast<unsigned long long>(it);
-					}
-					else if (it.type() == typeid(const char*)) {
-						fmt % boost::any_cast<const char*>(it);
-					}
-					else if (it.type() == typeid(std::string)) {
-						fmt % boost::any_cast<std::string>(it).c_str();
-					}
-					else if (it.type() == typeid(char)) {
-						fmt % boost::any_cast<char>(it);
-					}
-				}
-				auto nPos = spLogLine->strFile.find_last_of("\\");
-				std::cout << utils::time_helper::Stamp2TimeString(spLogLine->ullTimeStamp) \
-					<< " [" \
-					<< log_helper::getLevelName(spLogLine->enLevel) \
-					<< "] " \
-					<< std::move(fmt.str()) \
-					<< " {" \
-					<< (std::string::npos == nPos ? spLogLine->strFile : spLogLine->strFile.substr(nPos + 1)) \
-					<< ":" \
-					<< spLogLine->uLine \
-					<< "}\n";
+				std::cout << m_Configure.spFormater->flat(spLogLine);
 
 				if (XLOG_WARN <= spLogLine->enLevel)
 					std::flush(std::cout);

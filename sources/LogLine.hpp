@@ -1,14 +1,13 @@
 #pragma once
-#include <boost/format.hpp>
+#include "LogLevel.hpp"
 #include "TimeHelper.hpp"
 #include "ParamPacker.hpp"
-#include "LogConfiguration.hpp"
 
 namespace log_helper
 {
-        typedef struct tagLogLine {
-        tagLogLine() = delete;
-        tagLogLine(LogLevel level,\
+    struct LogLine {
+        LogLine() = delete;
+        LogLine(LogLevel level,\
             const char* pszFile,\
             unsigned int line,\
             const char* pszFunction, \
@@ -24,6 +23,6 @@ namespace log_helper
         std::string strFunction;
         std::string strLogFmt;
         utils::ParamPacker stParams;
-    }LogLine;
+    };
 
 }

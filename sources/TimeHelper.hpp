@@ -1,6 +1,8 @@
 #pragma once
+#include <ctime>
 #include <chrono>
-#include <time.h>
+#include <string>
+
 namespace utils
 {
     namespace time_helper
@@ -25,14 +27,14 @@ namespace utils
 			tm_now.tm_hour = 0;
 			tm_now.tm_min = 0;
 			tm_now.tm_sec = 0;
-			auto tp = std::chrono::system_clock::from_time_t(std::mktime(&tm_now));
+			auto tp = std::chrono::system_clock::from_time_t(mktime(&tm_now));
 			return std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count();
 		}
 
 		//todo: show microseconds
 		inline std::string GetDateTime(const char* pszFormat = "%Y%m%d")
 		{
-			std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+			time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 			struct tm tm_now;
 #ifdef _WIN32
 			localtime_s(&tm_now, &now);
