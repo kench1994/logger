@@ -1,9 +1,9 @@
 #pragma once
+#include <string>
 #include "LogLine.hpp"
 #include "IPrinter.hpp"
-#include "BlockQueue.hpp"
-#include <string>
 #include <unordered_map>
+#include <utils/blockqueue.hpp>
 #include <boost/format.hpp>
 
 
